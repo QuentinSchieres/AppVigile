@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">RunTouz Co</string>
+    <string name="aucun_article">Aucun article detecté</string>
+    <string name="Runtouz_2023">Runtouz-2023\nTous droits réservé</string>
+    <string name="Logo">Logo Runtouz</string>
+    <string name="Id">Identifiant</string>
+    <string name="mdp">Mot de passe</string>
+    <string name="TXTacceuil">Application Vigile RunTouz</string>
+    <string name="InfosArticle">Informations de l\'article</string>
+    <string name="nom">Nom de l\'article : </string>
+    <string name="code_barre">Code barre : </string>
+    <string name="marque">Marque : </string>
+    <string name="prix">Prix : </string>
+    <string name="Connexion">Connexion</string>
+
+    <string name="title_activity_aucun_article">AucunArticle</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+</resources>
