@@ -92,7 +92,7 @@ class DatabaseManager {
     fun getArticle(): List<Article>{
         val connection = DriverManager.getConnection(url, user, password)
         val statement = connection.createStatement()
-        val resultSet = statement.executeQuery("SELECT * from produits ")//where scanrfid = qcc que je recup avant
+        val resultSet = statement.executeQuery("SELECT * from produits")//where scanrfid = qcc que je recup avant
 
         val articles = mutableListOf<Article>()
         while (resultSet.next()) {
