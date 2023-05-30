@@ -67,7 +67,6 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     Acceuil()
-                    //DestinationsNavHost(navGraph = NavGraphs.root)
                 }
             }
         }
@@ -85,7 +84,7 @@ data class Article(
 )
 
 class DatabaseManager {
-    private val url = "jdbc:mysql://172.20.31.116/appvigile"
+    private val url = "jdbc:mysql://172.20.31.144/appvigile"
     private val user = "vigile_runtouz"
     private val password = "runtouz2023"
 
@@ -116,13 +115,9 @@ class DatabaseManager {
     }
 }
 
-//@Destination(start = true)
 @Composable
-fun Acceuil(
-   //navigator: DestinationsNavigator
-){
+fun Acceuil(){
     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-
 
         var idInput by remember { mutableStateOf("") }
         var mdpInput by remember { mutableStateOf("") }
@@ -173,9 +168,7 @@ fun Acceuil(
             )
             Spacer(modifier = Modifier.height(120.dp))
             Button(
-                onClick = {
-                    //navigator.navigate(AucunArticleDestination())
-                },
+                onClick = {},
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Blue,
                     contentColor = Color.White
@@ -183,15 +176,6 @@ fun Acceuil(
             ) {
                 Text(text = stringResource(R.string.Connexion))
             }
-            Button(
-                onClick = {
-                    //navigator.navigate(InfosArticleDestination())
-
-                }
-            ) {
-                Text(text = "Test")
-            }
-
             Spacer(modifier = Modifier.height(154.dp))
             Row {
                 Text(text = stringResource(id = R.string.Runtouz_2023))
@@ -223,11 +207,8 @@ fun ChampTxt(label : Int,
     )
 }
 
-//@Destination
 @Composable
-fun AucunArticle(
-    //navigator: DestinationsNavigator
-) {
+fun AucunArticle() {
     var popupControl by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier
@@ -269,10 +250,8 @@ fun AucunArticle(
     Row { Text(text = stringResource(id = R.string.Runtouz_2023)) }
 }
 
-//@Destination
 @Composable
-fun InfosArticle(
-) {
+fun InfosArticle() {
     var result by remember { mutableStateOf(emptyList<Article>()) }
 
     LaunchedEffect(Unit){
@@ -281,7 +260,6 @@ fun InfosArticle(
         }
         result = data
     }
-
      Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -299,7 +277,6 @@ fun InfosArticle(
                     )
                 }
             }
-
             Spacer(modifier = Modifier.height(35.dp))
             Text(
                 text = stringResource(id = R.string.InfosArticle),
