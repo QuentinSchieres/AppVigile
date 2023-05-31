@@ -67,13 +67,13 @@ dependencies {
     debugImplementation 'androidx.compose.ui:ui-tooling'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
 
-    implementation 'io.github.raamcosta.compose-destinations:core:1.9.40-beta'
-    ksp 'io.github.raamcosta.compose-destinations:ksp:1.9.40-beta'
-
     implementation 'mysql:mysql-connector-java:5.1.46' // NE PAS CHANGER VERSION
 
-    def nav_version = "2.5.3"
-    implementation "androidx.navigation:navigation-compose:$nav_version"
+    //def nav_version = "2.5.3"
+    //implementation "androidx.navigation:navigation-compose:$nav_version"
 
 }
 
+configurations.implementation {
+    exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
+}

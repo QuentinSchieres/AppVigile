@@ -91,7 +91,7 @@ class DatabaseManager {
     fun getArticle(): List<Article>{
         val connection = DriverManager.getConnection(url, user, password)
         val statement = connection.createStatement()
-        val resultSet = statement.executeQuery("SELECT * from produits")//where scanrfid = qcc que je recup avant
+        val resultSet = statement.executeQuery("SELECT * from produits")
 
         val articles = mutableListOf<Article>()
         while (resultSet.next()) {
@@ -283,21 +283,23 @@ fun InfosArticle() {
                 fontSize = 34.sp,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
-            Spacer(modifier = Modifier.height(150.dp))
-            Text(text = stringResource(id = R.string.nom), fontSize = 20.sp)
+            AfficheTexte(texte = stringResource(R.string.nom))
             ArticleList(result, "nom")
-            Spacer(modifier = Modifier.height(150.dp))
-            Text(text = stringResource(id = R.string.code_barre), fontSize = 20.sp)
+            AfficheTexte(texte = stringResource(R.string.code_barre))
             ArticleList(result, "code barre")
-            Spacer(modifier = Modifier.height(150.dp))
-            Text(text = stringResource(id = R.string.marque), fontSize = 20.sp)
+            AfficheTexte(texte = stringResource(R.string.marque))
             ArticleList(result, "marque")
-            Spacer(modifier = Modifier.height(150.dp))
-            Text(text = stringResource(id = R.string.prix), fontSize = 20.sp)
+            AfficheTexte(texte = stringResource(id = R.string.prix))
             ArticleList(result, "prix")
             Spacer(modifier = Modifier.height(300.dp))
             Text(text = stringResource(id = R.string.Runtouz_2023))
         }
+}
+
+@Composable
+fun AfficheTexte(texte : String){
+    Spacer(modifier = Modifier.height(150.dp))
+    Text(text = texte, fontSize = 20.sp)
 }
 
 @Composable
