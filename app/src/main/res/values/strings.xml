@@ -12,5 +12,5 @@
     <string name="marque">Marque : </string>
     <string name="prix">Prix : </string>
     <string name="Connexion">Connexion</string>
-
+    <string name="article_vu">Un article a été détecté</string>
 </resources>

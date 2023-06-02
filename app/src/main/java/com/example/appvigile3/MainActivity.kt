@@ -137,6 +137,13 @@ class DatabaseManager {
         return articles
     }
 
+    fun decreaseStock(tagrfid: String){
+        val connection = DriverManager.getConnection(url, user, password)
+        val statement = connection.createStatement()
+        val uptade = "UPDATE `produits` SET `checkstock` = '254' WHERE `produits`.`rfid` = '${tagrfid}'"
+        val resultSet = statement.executeUpdate(uptade)
+    }
+
     fun checkUser(id: String, mdp: String): Boolean{
         val connection = DriverManager.getConnection(url, user, password)
         val statement = connection.createStatement()
@@ -255,6 +262,34 @@ fun ChampTxt(label : Int,
 @Composable
 fun AucunArticle(navController: NavController) {
 
+    var result by remember { mutableStateOf(emptyList<Article>()) }
+    var detection  by remember { mutableStateOf("") }
+    var couleur by remember { mutableStateOf(Color.White) }
+    detection = stringResource(R.string.aucun_article)
+
+    LaunchedEffect(Unit){
+        val data = withContext(Dispatchers.IO){
+            DatabaseManager().getArticle()
+        }
+        result = data
+    }
+
+    result.forEach { article ->
+        if(article.checkstock != article.stock){
+            couleur = Color.Red
+            detection = ""
+        }
+        else{
+            LaunchedEffect(Unit){
+                withContext(Dispatchers.IO){
+                    DatabaseManager().decreaseStock(article.scanrfid)
+                }
+            }
+        }
+    }
+
+
+
     Column(modifier = Modifier
         .fillMaxWidth()
         .fillMaxHeight()
@@ -268,7 +303,7 @@ fun AucunArticle(navController: NavController) {
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            Text(text = stringResource(id = R.string.aucun_article), fontSize = 34.sp)
+            Text(text = detection, fontSize = 34.sp)
             Spacer(modifier = Modifier.height(16.dp))
             Image(
                 painter = painterResource(id = R.drawable.runtouz_3),
@@ -276,9 +311,9 @@ fun AucunArticle(navController: NavController) {
             )
           Button(onClick = {
               navController.navigate(Screen.InfosArticle.route)
-          },colors = ButtonDefaults.buttonColors(containerColor = Color.Red, contentColor = Color.White)
+          },colors = ButtonDefaults.buttonColors(containerColor = couleur, contentColor = Color.White)
           ) {
-              Text(text = "texte")
+              Text(text = stringResource(R.string.article_vu))
           }
         }
         Spacer(modifier = Modifier.height(400.dp))
