@@ -156,7 +156,7 @@ fun Acceuil(navController: NavController){
     var result by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
-    LaunchedEffect(Unit){
+    LaunchedEffect(idInput, mdpInput){
         val data = withContext(Dispatchers.IO){
             DatabaseManager().checkUser(idInput, mdpInput)
         }
@@ -169,68 +169,66 @@ fun Acceuil(navController: NavController){
             .verticalScroll(
                 rememberScrollState()
             )
+    ) {
+        Spacer(modifier = Modifier.height(150.dp))
+        Text(
+            text = stringResource(id = R.string.TXTacceuil),
+            fontSize = 34.sp,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Image(
+            painter = painterResource(R.drawable.runtouz_3),
+            contentDescription = stringResource(R.string.Logo),
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+        ChampTxt(
+            label = R.string.Id,
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
+            value = idInput,
+            onValueChange = { idInput = it },
+            aspectClavier = VisualTransformation.None
+        )
+        Spacer(modifier = Modifier.height(40.dp))
+        ChampTxt(
+            label = R.string.mdp,
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+            value = mdpInput,
+            onValueChange = { mdpInput = it },
+            aspectClavier = PasswordVisualTransformation()
+        )
+        Spacer(modifier = Modifier.height(60.dp))
+        Text(errormessage, color = Color.Red)
+        Spacer(modifier = Modifier.height(120.dp))
+        Button(
+            onClick = {
+                if(result){
+                    navController.navigate(Screen.AucunArticle.route)
+                }
+                else{
+                    errormessage = "Identifiants incorrects"
+                } },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Blue,
+                contentColor = Color.White
+            )
         ) {
-            Spacer(modifier = Modifier.height(150.dp))
-            Text(
-                text = stringResource(id = R.string.TXTacceuil),
-                fontSize = 34.sp,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Image(
-                painter = painterResource(R.drawable.runtouz_3),
-                contentDescription = stringResource(R.string.Logo),
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            ChampTxt(
-                label = R.string.Id,
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Next
-                ),
-                keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
-                value = idInput,
-                onValueChange = { idInput = it },
-                aspectClavier = VisualTransformation.None
-            )
-            Spacer(modifier = Modifier.height(40.dp))
-            ChampTxt(
-                label = R.string.mdp,
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-                value = mdpInput,
-                onValueChange = { mdpInput = it },
-                aspectClavier = PasswordVisualTransformation()
-            )
-            Spacer(modifier = Modifier.height(60.dp))
-            Text(errormessage, color = Color.Red)
-            Spacer(modifier = Modifier.height(120.dp))
-            Button(
-                onClick = {
-                    if(result){
-                        navController.navigate(Screen.AucunArticle.route)
-                    }
-                    else{
-                        errormessage = "Identifiants incorrects"
-                    }
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Blue,
-                    contentColor = Color.White
-                )
-            ) {
-                Text(text = stringResource(R.string.Connexion))
-            }
-            Spacer(modifier = Modifier.height(154.dp))
-            Row {
-                Text(text = stringResource(id = R.string.Runtouz_2023))
-            }
+            Text(text = stringResource(R.string.Connexion))
         }
-    Spacer(modifier = Modifier.height(200.dp))
+        Spacer(modifier = Modifier.height(154.dp))
+        Row {
+            Text(text = stringResource(id = R.string.Runtouz_2023))
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -260,7 +258,8 @@ fun AucunArticle(navController: NavController) {
     Column(modifier = Modifier
         .fillMaxWidth()
         .fillMaxHeight()
-        .padding(32.dp),
+        .padding(32.dp)
+        .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Center
     ) {
         Spacer(modifier = Modifier.height(250.dp))
@@ -275,13 +274,16 @@ fun AucunArticle(navController: NavController) {
                 painter = painterResource(id = R.drawable.runtouz_3),
                 contentDescription = stringResource(id = R.string.Logo)
             )
-          Button(onClick = { navController.navigate(Screen.InfosArticle.route) }) {
+          Button(onClick = {
+              navController.navigate(Screen.InfosArticle.route)
+          },colors = ButtonDefaults.buttonColors(containerColor = Color.Red, contentColor = Color.White)
+          ) {
               Text(text = "texte")
           }
         }
+        Spacer(modifier = Modifier.height(400.dp))
+        Row { Text(text = stringResource(id = R.string.Runtouz_2023)) }
     }
-    Spacer(modifier = Modifier.height(450.dp))
-    Row { Text(text = stringResource(id = R.string.Runtouz_2023)) }
 }
 
 @Composable
