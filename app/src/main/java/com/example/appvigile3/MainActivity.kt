@@ -4,8 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,7 +28,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -51,6 +48,10 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.appvigile3.ui.theme.AppVigile3Theme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -66,9 +67,31 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Acceuil()
+                    Navigation()
                 }
             }
+        }
+    }
+}
+
+sealed class Screen(val route: String){
+    object Acceuil: Screen("ecran_acceuil")
+    object AucunArticle: Screen("ecran_aucunarticle")
+    object InfosArticle: Screen("ecran_infosarticle")
+}
+
+@Composable
+fun Navigation(){
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = Screen.Acceuil.route) {
+        composable(route = Screen.Acceuil.route){
+            Acceuil(navController = navController)
+        }
+        composable(route = Screen.AucunArticle.route){
+            AucunArticle(navController = navController)
+        }
+        composable(route = Screen.InfosArticle.route){
+            InfosArticle(navController = navController)
         }
     }
 }
@@ -84,21 +107,21 @@ data class Article(
 )
 
 class DatabaseManager {
-    private val url = "jdbc:mysql://172.20.31.144/appvigile"
-    private val user = "vigile_runtouz"
-    private val password = "runtouz2023"
+    private val url = "jdbc:mysql://172.20.100.33/runtouz"
+    private val user = "RunTouz"
+    private val password = "RunTouz2023"
 
     fun getArticle(): List<Article>{
         val connection = DriverManager.getConnection(url, user, password)
         val statement = connection.createStatement()
-        val resultSet = statement.executeQuery("SELECT * from produits")
+        val resultSet = statement.executeQuery("SELECT * from produits where rfid = \"0007366977 112,26945\"")
 
         val articles = mutableListOf<Article>()
         while (resultSet.next()) {
 
             val dataObject = Article(
-                resultSet.getString("scanrfid"),
-                resultSet.getInt("codebarre"),
+                resultSet.getString("rfid"),
+                resultSet.getInt("code_barre"),
                 resultSet.getString("nom"),
                 resultSet.getString("marque"),
                 resultSet.getFloat("prix"),
@@ -113,22 +136,39 @@ class DatabaseManager {
 
         return articles
     }
+
+    fun checkUser(id: String, mdp: String): Boolean{
+        val connection = DriverManager.getConnection(url, user, password)
+        val statement = connection.createStatement()
+        val query = "SELECT * from appvigile where identifiant = \"$id\" and mdp = \"$mdp\""
+        val resultSet = statement.executeQuery(query)
+
+        return resultSet.next()
+    }
 }
 
 @Composable
-fun Acceuil(){
-    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+fun Acceuil(navController: NavController){
 
-        var idInput by remember { mutableStateOf("") }
-        var mdpInput by remember { mutableStateOf("") }
-        val focusManager = LocalFocusManager.current
+    var idInput by remember { mutableStateOf("") }
+    var mdpInput by remember { mutableStateOf("") }
+    var errormessage by remember { mutableStateOf("") }
+    var result by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
 
-        Column(
-            verticalArrangement = Arrangement.Center, modifier = Modifier
-                .padding(32.dp)
-                /*.verticalScroll(
-                    rememberScrollState()
-                )*/
+    LaunchedEffect(Unit){
+        val data = withContext(Dispatchers.IO){
+            DatabaseManager().checkUser(idInput, mdpInput)
+        }
+        result = data
+    }
+
+    Column(
+        verticalArrangement = Arrangement.Center, modifier = Modifier
+            .padding(32.dp)
+            .verticalScroll(
+                rememberScrollState()
+            )
         ) {
             Spacer(modifier = Modifier.height(150.dp))
             Text(
@@ -166,9 +206,18 @@ fun Acceuil(){
                 onValueChange = { mdpInput = it },
                 aspectClavier = PasswordVisualTransformation()
             )
+            Spacer(modifier = Modifier.height(60.dp))
+            Text(errormessage, color = Color.Red)
             Spacer(modifier = Modifier.height(120.dp))
             Button(
-                onClick = {},
+                onClick = {
+                    if(result){
+                        navController.navigate(Screen.AucunArticle.route)
+                    }
+                    else{
+                        errormessage = "Identifiants incorrects"
+                    }
+                },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Blue,
                     contentColor = Color.White
@@ -181,9 +230,7 @@ fun Acceuil(){
                 Text(text = stringResource(id = R.string.Runtouz_2023))
             }
         }
-        Spacer(modifier = Modifier.height(200.dp))
-        AucunArticle()
-    }
+    Spacer(modifier = Modifier.height(200.dp))
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -208,14 +255,12 @@ fun ChampTxt(label : Int,
 }
 
 @Composable
-fun AucunArticle() {
-    var popupControl by remember { mutableStateOf(false) }
+fun AucunArticle(navController: NavController) {
 
     Column(modifier = Modifier
         .fillMaxWidth()
         .fillMaxHeight()
         .padding(32.dp),
-        //.verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Center
     ) {
         Spacer(modifier = Modifier.height(250.dp))
@@ -230,20 +275,9 @@ fun AucunArticle() {
                 painter = painterResource(id = R.drawable.runtouz_3),
                 contentDescription = stringResource(id = R.string.Logo)
             )
-            TextButton(onClick = {popupControl = true}) {
-                Text(text = "popup", color = Color.Black)
-            }
-            if(popupControl){
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight()
-                        .background(Color.Gray)
-                        .clickable { popupControl = false }
-                ){
-                    InfosArticle()
-                }
-            }
+          Button(onClick = { navController.navigate(Screen.InfosArticle.route) }) {
+              Text(text = "texte")
+          }
         }
     }
     Spacer(modifier = Modifier.height(450.dp))
@@ -251,7 +285,7 @@ fun AucunArticle() {
 }
 
 @Composable
-fun InfosArticle() {
+fun InfosArticle(navController: NavController) {
     var result by remember { mutableStateOf(emptyList<Article>()) }
 
     LaunchedEffect(Unit){
@@ -265,10 +299,11 @@ fun InfosArticle() {
                 .fillMaxWidth()
                 .fillMaxHeight()
                 .padding(32.dp)
+                .verticalScroll(rememberScrollState())
         ) {
             Box(modifier = Modifier.align(Alignment.End)) {
                 IconButton(
-                    onClick = {
+                    onClick = { navController.navigate(Screen.AucunArticle.route)
                     }
                 ) {
                     Icon(
@@ -291,7 +326,7 @@ fun InfosArticle() {
             ArticleList(result, "marque")
             AfficheTexte(texte = stringResource(id = R.string.prix))
             ArticleList(result, "prix")
-            Spacer(modifier = Modifier.height(300.dp))
+            Spacer(modifier = Modifier.height(250.dp))
             Text(text = stringResource(id = R.string.Runtouz_2023))
         }
 }
@@ -312,12 +347,12 @@ fun ArticleList(articles: List<Article>, affiche : String){
 }
 
 @Composable
-fun ArticleListItem(articles: Article, affiche: String){
+fun ArticleListItem(article: Article, affiche: String){
     Spacer(modifier = Modifier.height(50.dp))
     when(affiche){
-        "nom" ->        Text(articles.nom, fontSize = 16.sp)
-        "code barre" -> Text("${articles.codebarre}", fontSize = 16.sp)
-        "marque" ->     Text(articles.marque, fontSize = 16.sp)
-        "prix" ->       Text("${articles.prix}", fontSize = 16.sp)
+        "nom" ->        Text(article.nom, fontSize = 16.sp)
+        "code barre" -> Text("${article.codebarre}", fontSize = 16.sp)
+        "marque" ->     Text(article.marque, fontSize = 16.sp)
+        "prix" ->       Text("${article.prix}", fontSize = 16.sp)
     }
 }
