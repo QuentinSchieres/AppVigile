@@ -267,6 +267,7 @@ fun AucunArticle(navController: NavController) {
     var couleur by remember { mutableStateOf(Color.White) }
     detection = stringResource(R.string.aucun_article)
 
+    // je suis un commentaire
     LaunchedEffect(Unit){
         val data = withContext(Dispatchers.IO){
             DatabaseManager().getArticle()
